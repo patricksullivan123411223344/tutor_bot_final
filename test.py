@@ -1,11 +1,11 @@
 import os
 from tutor import TutorBot
 from user import User
-from user_profile import UserProfile
+from user_profile import UserProfileHandler
 
 user = User()
 tutor = TutorBot(f"{user.name}'s Tutor", "gemma3:1b")
-user_profile = UserProfile(user)
+user_profile = UserProfileHandler(user)
 
 exit_conditions = [
     "Bye",
@@ -19,6 +19,10 @@ exit_conditions = [
 print("\n==== WELCOME TO THE TUTOR BOT ====\n")
 print("\n==== TYPE BYE OR STOP TO EXIT CHAT ====\n")
 
+# THIS CONDITIONAL IS NOT WORKING AFTER THE INITIAL USER PROFILE IS ALREADY MADE.
+# Must reconsider the if not appraoach. Could be the following reasons:
+#   - Filenames/structure are not matching
+#   - The system is not as plug and play as I assumed, and must require some helper functions to normalize the actual filepath names
 if not os.path.exists(user_profile.filepath_user_profile):
     data = user_profile.user_first_chat()
     user.updatePlayerClass(data)
@@ -35,4 +39,4 @@ while True:
     
     response = tutor.respond(player_message.strip())
 
-    print(response.strip())
+    print("\n", response.strip())

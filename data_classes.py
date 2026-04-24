@@ -3,6 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class UserProfilePayload:
     user_name: str
+    user_id: str
     user_subject: str
     user_skill_level: str
 

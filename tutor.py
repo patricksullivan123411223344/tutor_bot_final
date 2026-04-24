@@ -22,24 +22,4 @@ class TutorBot:
         reply = response["message"]["content"].strip()
         return reply
 
-@dataclass
-class UserPayloadSlow:
-    user_name: str
-    user_subject: str
-    user_skill_level: str
-
-@dataclass 
-class UserPayloadFast:
-    user_friction_score: str
-    user_current_objective: str
-
-@dataclass 
-class LLMPayload:
-    tutor_name: str
-    tutor_state: str
-    current_chat: dict
-    ltm: dict 
-
-
-
 
