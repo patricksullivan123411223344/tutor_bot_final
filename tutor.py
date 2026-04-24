@@ -5,6 +5,7 @@ from user import User
 
 class TutorBot:
     def __init__(self, user: User, name: str, model: str):
+        self.user = user
         self.name = name
         self.model = model
     
@@ -24,7 +25,7 @@ class TutorBot:
         User Current Objective: {session_handler.user_current_objective}
         User Friction Score: {session_handler.user_friction_score}
         
-        Refer to the user by their name. Pay attention to their skill level and their subject of interest. 
+        Refer to the user by their name. Pay attention to their skill level and their subject of interest.
         """
     
     def respond(self, user_message: str) -> str:
