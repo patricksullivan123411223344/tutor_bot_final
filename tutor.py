@@ -23,13 +23,13 @@ class TutorBot:
         return reply
 
 @dataclass
-class UserPayloadStateless:
+class UserPayloadSlow:
     user_name: str
     user_subject: str
     user_skill_level: str
 
 @dataclass 
-class UserPayloadStateful:
+class UserPayloadFast:
     user_friction_score: str
     user_current_objective: str
 

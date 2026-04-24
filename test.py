@@ -1,12 +1,11 @@
-import sys
 import os
 from tutor import TutorBot
 from user import User
-from player_data_logs import PlayerDataHandler
+from user_profile import UserProfile
 
-user = User("User")
+user = User()
 tutor = TutorBot(f"{user.name}'s Tutor", "gemma3:1b")
-handler = PlayerDataHandler(user)
+user_profile = UserProfile(user)
 
 exit_conditions = [
     "Bye",
@@ -20,9 +19,10 @@ exit_conditions = [
 print("\n==== WELCOME TO THE TUTOR BOT ====\n")
 print("\n==== TYPE BYE OR STOP TO EXIT CHAT ====\n")
 
-if not os.path.exists(handler.filepath_pd):
-    data = handler.user_first_chat()
-    handler.save_player_data(data)
+if not os.path.exists(user_profile.filepath_user_profile):
+    data = user_profile.user_first_chat()
+    user.updatePlayerClass(data)
+    user_profile.save_user_profile(data)
 
 while True:
 
