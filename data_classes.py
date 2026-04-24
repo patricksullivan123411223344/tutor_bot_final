@@ -1,4 +1,4 @@
-from dataclasses import dataclass 
+from dataclasses import dataclass
 
 @dataclass
 class UserProfilePayload:
@@ -11,10 +11,12 @@ class UserProfilePayload:
 class SessionStatePayload:
     user_friction_score: str
     user_current_objective: str
+    session_id: int
 
 @dataclass 
 class TutorPayload:
     tutor_name: str
     tutor_state: str
-    current_chat: dict
     ltm: dict 
+    user_profile: UserProfilePayload
+    session_state: SessionStatePayload 

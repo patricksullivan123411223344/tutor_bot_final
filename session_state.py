@@ -3,11 +3,14 @@ from user import User
 import json
 import os
 
-class SessionState:
+class SessionStateHandler:
     def __init__(self, user: User):
         self.user = user
-        self.filepath_session_state = f"memory_files/user_data/{user.name}_state.json"
     
+    @property
+    def filepath_session_state(self) -> str:
+        return f"session_files/{self.user.session_id}_session_state"
+
     def save_user_state(self, user_state: SessionStatePayload) -> None:
         """This function will save the user state based upon the UserPayload data class"""
         data = {
@@ -32,4 +35,26 @@ class SessionState:
         return SessionStatePayload(
             user_friction_score=data["user_friction_score"],
             user_current_objective=data["user_current_objective"]
-        )    
+        )
+
+"""This will hold all during chat logic to be updated and tripped"""
+class SessionStateController:
+    def __init__(self, user: User):
+        self.user = user
+    
+    def get_friction_score(self, player_message: str) -> SessionStatePayload:
+        if "confused" or "don't understand" in player_message:
+            friction_score = "<:HIGH:>"
+        elif "understand" or "makes sense" in player_message:
+            friction_score = "<:LOW:>"
+        
+        return SessionStatePayload(
+            user_friction_score=friction_score
+        )
+    
+    def get_current_objective(self) -> SessionStatePayload:
+        objective = input("\nTutor: What's on the schedule for today?")
+        return SessionStatePayload(
+            user_current_objective=objective
+        )
+

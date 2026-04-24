@@ -4,6 +4,7 @@ class User:
     def __init__(self):
         self.name = ""
         self.user_id = ""
+        self.session_id = ""
         self.subject_of_interest = ""
         self.skill_level = ""
     

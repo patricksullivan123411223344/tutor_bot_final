@@ -2,10 +2,13 @@ import os
 from tutor import TutorBot
 from user import User
 from user_profile import UserProfileHandler
+from session_state import SessionStateHandler, SessionStateController
 
 user = User()
-tutor = TutorBot(f"{user.name}'s Tutor", "gemma3:1b")
-user_profile = UserProfileHandler(user)
+tutor = TutorBot(f"{user}, {user.name}'s Tutor", "gemma3:1b") # tutor is missing a positonal arg "model" for some reason. may want to check this out.
+user_handler = UserProfileHandler(user)
+session_handler = SessionStateHandler(user)
+session_controller = SessionStateController(user)
 
 exit_conditions = [
     "Bye",
@@ -23,10 +26,14 @@ print("\n==== TYPE BYE OR STOP TO EXIT CHAT ====\n")
 # Must reconsider the if not appraoach. Could be the following reasons:
 #   - Filenames/structure are not matching
 #   - The system is not as plug and play as I assumed, and must require some helper functions to normalize the actual filepath names
-if not os.path.exists(user_profile.filepath_user_profile):
-    data = user_profile.user_first_chat()
+if not os.path.exists(user_handler.filepath_user_profile()):
+    data = user_handler.user_first_chat()
     user.updatePlayerClass(data)
-    user_profile.save_user_profile(data)
+    user_handler.save_user_profile(data)
+
+if not os.path.exists(session_handler.filepath_session_state()):
+    data = session_controller.get_current_objective()
+    session_handler.save_user_state(data)
 
 while True:
 
