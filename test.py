@@ -1,14 +1,14 @@
 import os
+from extract_config import load_user_id, save_user_id
 from tutor import TutorBot
-from user import User
-from user_profile import UserProfileHandler
-from session_state import SessionStateHandler, SessionStateController
+from user_profile import User, UserProfileHandler
 
-user = User()
-tutor = TutorBot(user, f"{user.name}'s Tutor", "gemma3:1b")
+user_id = load_user_id()
+user = User(user_id)
+tutor = TutorBot(user, "Tutor", "gemma3:1b")
 user_handler = UserProfileHandler(user)
-session_handler = SessionStateHandler(user)
-session_controller = SessionStateController(user)
+
+print(user_id)
 
 exit_conditions = [
     "Bye",
@@ -22,17 +22,14 @@ exit_conditions = [
 print("\n==== WELCOME TO THE TUTOR BOT ====\n")
 print("\n==== TYPE BYE OR STOP TO EXIT CHAT ====\n")
 
-try:
-    data = user_handler.load_user_data()
-    user.updatePlayerClass(data)
-except (RuntimeWarning, FileNotFoundError):
+if not os.path.isfile("user_profile.json"):
     data = user_handler.user_first_chat()
+    save_user_id(data.user_id)
     user.updatePlayerClass(data)
     user_handler.save_user_profile(data)
-
-if not os.path.exists(session_handler.filepath_session_state):
-    data = session_controller.get_current_objective()
-    session_handler.save_user_state(data)
+else:
+    data = user_handler.load_user_data(user_id)
+    user.updatePlayerClass(data)
 
 while True:
 
@@ -43,6 +40,6 @@ while True:
         print("\n==== GOODBYE ====\n")
         break
     
-    response = tutor.respond(player_message.strip())
+    response = tutor.respond(player_message.strip(), user)
 
     print("\n", response.strip())

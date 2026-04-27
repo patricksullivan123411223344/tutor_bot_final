@@ -1,25 +1,29 @@
 from data_classes import UserProfilePayload
-from user import User 
+from extract_config import create_user_id
 import json
 import os
 
+class User:
+    def __init__(self, user_id):
+        self.name = ""
+        self.id = user_id
+        self.subject_of_interest = ""
+        self.skill_level = ""
+    
+    def updatePlayerClass(self, data: UserProfilePayload) -> None:
+        """Although this function is impure, it is initialization logic, which is unavoidable for this system."""
+        self.name = data.user_name
+        self.user_id = data.user_id
+        self.subject_of_interest = data.user_subject
+        self.skill_level = data.user_skill_level
+
 class UserProfileHandler:
-    def __init__(self, user: User):
-        self.user = user
-    
-    # property helps because instead of passing a stale method, it recomputes each time.
-    # originally, the filename was an element of the UserProfile class, but that sets the filename in stone. 
-    # what we want is a method of recomputing per user, per name, so instead of passing through a stale method,
-    # the name is correctly updated each time.
-    @property
-    def filepath_user_profile(self) -> str:
-        return f"memory_files/user_data/{self.user.user_id}_profile.json"
-    
-    # this will allow us to take the name inputted, clean it up, and create an actual user_id that is readable and consistent
-    # across users. 
-    @staticmethod
-    def normalize_name(name: str) -> str:
-        return name.strip().lower()
+    def __init__(self, user_id: User):
+        self.user_id = user_id
+        self.user_name = ""
+        self.session_id = ""
+        self.subject_of_interest = ""
+        self.skill_level = ""
     
     def user_first_chat(self) -> UserProfilePayload:
         """This is the first function to collect initial user information on the user's first chat interaction. Think of it like an onboarding."""
@@ -30,12 +34,12 @@ class UserProfileHandler:
 
         return UserProfilePayload(
             user_name=user_name,
-            user_id=self.normalize_name(user_name),
+            user_id=create_user_id(user_name),
             user_subject=user_subject, 
             user_skill_level=user_skill_level
         )
 
-    def save_user_profile(self, player_data: UserProfilePayload) -> None:
+    def save_user_profile(self, user_id: str, player_data: UserProfilePayload) -> None:
         """This function collects the consistent user data. It does NOT collect state information"""  
         data = {
             "user_name": player_data.user_name,
@@ -44,18 +48,21 @@ class UserProfileHandler:
             "user_skill_level": player_data.user_skill_level
         }
 
-        if not os.path.exists(self.filepath_user_profile):
-            os.makedirs(os.path.dirname(self.filepath_user_profile), exist_ok=True)
+        filepath = f"user_profiles/{data["user_id"]})_profile.json"
+
+        if not os.path.exists(filepath):
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
         
-        with open(self.filepath_user_profile, "w") as f:
+        with open(filepath, "w") as f:
             json.dump(data, f, indent=4)
     
-    def load_user_data(self) -> UserProfilePayload:
+    def load_user_data(self, user_id) -> UserProfilePayload:
         """This function does NOT load state. We only load the consistent information from here."""
-        if not os.path.exists(self.filepath_user_profile):
-            raise RuntimeWarning(f"Warning: {self.filepath_user_profile} does not exist! Please save first memory.")
+        filepath = f"user_profiles/{user_id}_profile.json"
+        if not os.path.isfile(filepath):
+            raise RuntimeWarning(f"Warning: {filepath} does not exist! Please save first memory.")
         
-        with open(self.filepath_user_profile, "r") as f:
+        with open(filepath, "r") as f:
             data = json.load(f)
         
         return UserProfilePayload(
